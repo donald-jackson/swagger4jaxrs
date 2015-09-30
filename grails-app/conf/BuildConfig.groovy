@@ -13,9 +13,9 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
-        compile 'com.wordnik:swagger-jaxrs_2.10:1.3.2'
-        compile 'com.fasterxml.jackson.core:jackson-core:2.1.0'
-        compile 'com.fasterxml.jackson.core:jackson-databind:2.1.0'
+        compile 'com.wordnik:swagger-jaxrs_2.10:1.3.12'
+        compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
+        compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1'
 
         if (owner.grailsVersion ==~ /2\.2\..*/) {
             test('org.spockframework:spock-grails-support:0.7-groovy-2.0') {
@@ -25,9 +25,10 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        compile(':jaxrs:0.8')
+        compile(':jaxrs:0.11')
 
-        build ':release:2.2.1', ':rest-client-builder:1.0.3', {
+        build(":release:3.1.1",
+                ":rest-client-builder:2.1.1") {
             export = false
         }
 

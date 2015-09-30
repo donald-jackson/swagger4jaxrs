@@ -24,7 +24,7 @@ class Swagger4jaxrsGrailsPlugin {
     def scm = [ url: "https://github.com/nerdErg/swagger4jaxrs" ]
 
     def dependsOn = [
-        jaxrs: "0.8 > *"
+        jaxrs: "0.11 > *"
     ]
 
     def loadAfter = [
@@ -61,7 +61,7 @@ class Swagger4jaxrsGrailsPlugin {
 
         event.ctx.getBean('swaggerConfig').with {
             resourcePackage = local.resourcePackage
-            basePath = local.basePath ?: ''
+            basePath = local.basePath ?: '/'+grails.util.Metadata.current.'app.name'
             version = local.version ?: "1"
             title = local.title ?: grails.util.Metadata.current.'app.name'
             description = local.description ?: ""
