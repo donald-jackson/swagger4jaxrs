@@ -24,7 +24,7 @@ class Swagger4jaxrsGrailsPlugin extends Plugin {
     def scm = [ url: "https://github.com/nerdErg/swagger4jaxrs" ]
 
     def loadAfter = [
-            "jaxrs-core"
+            "jaxrs-core",
             "jaxrs-jersey1"
     ]
 
