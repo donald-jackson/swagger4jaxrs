@@ -16,7 +16,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version "0.4"
+version "3.0.0"
 group "org.grails.plugins"
 
 apply plugin: 'maven-publish'
@@ -67,7 +67,7 @@ dependencies {
 
     compile 'io.swagger:swagger-jaxrs:1.5.5'
 
-    compile 'org.grails.plugins:jaxrs:0.12'
+    compile 'org.grails.plugins:jaxrs-jersey1:3.0.1'
 
 }
 
