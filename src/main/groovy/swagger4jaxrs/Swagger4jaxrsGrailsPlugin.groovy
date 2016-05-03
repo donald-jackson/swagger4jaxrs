@@ -5,7 +5,7 @@ import grails.util.Environment
 import io.swagger.jaxrs.config.BeanConfig
 
 class Swagger4jaxrsGrailsPlugin extends Plugin {
-    def version = "0.4"
+    def version = "3.0.1"
     def grailsVersion = "3.0 > *"
     def pluginExcludes = [
             "web-app/WEB-INF/**"
@@ -23,12 +23,9 @@ class Swagger4jaxrsGrailsPlugin extends Plugin {
     def issueManagement = [ system: "GitHub", url: "https://github.com/nerdErg/swagger4jaxrs/issues" ]
     def scm = [ url: "https://github.com/nerdErg/swagger4jaxrs" ]
 
-    def dependsOn = [
-            jaxrs: "0.12 > *"
-    ]
-
     def loadAfter = [
-            "jaxrs"
+            "jaxrs-core"
+            "jaxrs-jersey1"
     ]
 
     Closure doWithSpring() {{ ->
