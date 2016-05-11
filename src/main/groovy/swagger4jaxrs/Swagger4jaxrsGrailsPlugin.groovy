@@ -1,97 +1,122 @@
-import grails.core.GrailsApplication
+package swagger4jaxrs
+
 import grails.plugins.Plugin
-import grails.util.Environment
-
+import groovy.util.logging.Log4j
 import io.swagger.jaxrs.config.BeanConfig
+import org.grails.plugins.jaxrs.core.ScanningResourceRegistrar
 
+@Log4j
 class Swagger4jaxrsGrailsPlugin extends Plugin {
-    def version = "3.0.1"
+    /**
+     * Grails version the plugin is intended for.
+     */
     def grailsVersion = "3.0 > *"
-    def pluginExcludes = [
-            "web-app/WEB-INF/**"
-    ]
-    def title = "Swagger for JAX-RS Plugin"
+
+    /**
+     * Plugin description.
+     */
     def description = 'Adds Swagger support to document REST APIs of projects that use the JAX-RS (JSR 311) plugin'
 
+    /**
+     * Documentation URL.
+     */
     def documentation = "https://github.com/nerdErg/swagger4jaxrs"
+
+    /**
+     * License.
+     */
     def license = "APACHE"
-    def organization = [ name: "nerdErg Pty. Ltd.", url: "http://www.nerderg.com/" ]
+
+    /**
+     * Organizations.
+     */
+    def organization = [name: "nerdErg Pty. Ltd.", url: "http://www.nerderg.com/"]
+
+    /**
+     * Developers.
+     */
     def developers = [
-            [ name: "Angel Ruiz", email: "aruizca@gmail.com" ],
-            [ name: "Aaron Brown", email: "brown.aaron.lloyd@gmail.com"],
+        [name: "Angel Ruiz", email: "aruizca@gmail.com"],
+        [name: "Aaron Brown", email: "brown.aaron.lloyd@gmail.com"],
     ]
-    def issueManagement = [ system: "GitHub", url: "https://github.com/nerdErg/swagger4jaxrs/issues" ]
-    def scm = [ url: "https://github.com/nerdErg/swagger4jaxrs" ]
 
+    /**
+     * Issues URL.
+     */
+    def issueManagement = [system: "GitHub", url: "https://github.com/nerdErg/swagger4jaxrs/issues"]
+
+    /**
+     * SCM URL.
+     */
+    def scm = [url: "https://github.com/nerdErg/swagger4jaxrs"]
+
+    /**
+     * Loading order.
+     */
     def loadAfter = [
-            "jaxrs-core",
-            "jaxrs-jersey1"
+        "jaxrs-core",
     ]
 
-    Closure doWithSpring() {{ ->
-        println "Configuring Swagger \n"
-        mergeConfig(grailsApplication)
+    /**
+     * Configure plugin beans.
+     *
+     * @return
+     */
+    Closure doWithSpring() {
+        { ->
+            log.info "Configuring Swagger..."
 
-        ConfigObject local = grailsApplication.config.'swagger4jaxrs'
+            Map config = getSwaggerConfiguration()
+            swaggerConfig(BeanConfig) { bean ->
+                bean.autowire = true
+                resourcePackage = config.resourcePackage
+                basePath = config.basePath
+                version = config.version ?: '1'
+                title = config.title ?: 'Unspecified'
+                description = config.description ?: ''
+                contact = config.contact ?: ''
+                license = config.license ?: ''
+                licenseUrl = config.licenseUrl ?: ''
+                scan = config.scan ?: true
+            }
 
-        validateLocalConfig(local)
-
-        swaggerConfig(BeanConfig) { bean ->
-            bean.autowire = true
-            resourcePackage = local.resourcePackage
-            basePath = local.basePath
-            version = local.version ?: '1'
-            title = local.title ?: 'Unspecified'
-            description = local.description ?: ''
-            contact = local.contact ?: ''
-            license = local.license ?: ''
-            licenseUrl = local.licenseUrl ?: ''
-            scan = local.scan ?: true
+            swaggerResourceRegistrar(ScanningResourceRegistrar, 'io.swagger.jaxrs.listing')
         }
-    }}
+    }
 
-    def onConfigChange(event) {
-        mergeConfig(grailsApplication)
-
-        ConfigObject local = grailsApplication.config.'swagger4jaxrs'
-
-        validateLocalConfig(local)
+    @Override
+    void onConfigChange(Map<String, Object> event) {
+        Map config = getSwaggerConfiguration()
 
         event.ctx.getBean('swaggerConfig').with {
-            resourcePackage = local.resourcePackage
-            basePath = local.basePath
-            version = local.version ?: "1"
-            title = local.title ?: 'Unspecified'
-            description = local.description ?: ""
-            contact = local.contact ?: ""
-            license = local.license ?: ""
-            licenseUrl = local.licenseUrl ?: ""
-            scan = local.scan ?: true
+            resourcePackage = config.resourcePackage
+            basePath = config.basePath
+            version = config.version ?: "1"
+            title = config.title ?: 'Unspecified'
+            description = config.description ?: ""
+            contact = config.contact ?: ""
+            license = config.license ?: ""
+            licenseUrl = config.licenseUrl ?: ""
+            scan = config.scan ?: true
         }
     }
 
     /**
-     * Merges plugin config with host app config, but allowing customization
-     * @param app
+     * Retrieves, validates, and returns the swagger configuration.
+     *
+     * @return Validated swagger configuration.
      */
-    private void mergeConfig(GrailsApplication app) {
-//        ConfigObject currentConfig = app.config.org.grails.jaxrs
-//        ConfigSlurper slurper = new ConfigSlurper(Environment.current.name)
-//        ConfigObject secondaryConfig = slurper.parse(app.classLoader.loadClass("SwaggerConfig"))
-//
-//        ConfigObject config = new ConfigObject()
-//        config.putAll(secondaryConfig.org.grails.jaxrs.merge(currentConfig))
-//
-//        app.config.org.grails.jaxrs = config
-    }
+    Map getSwaggerConfiguration() {
+        Map config = getGrailsApplication().config.'swagger4jaxrs' as Map
 
-    private void validateLocalConfig(ConfigObject local) {
-        if (local.isEmpty()) {
+        if (config.isEmpty()) {
             throw new IllegalStateException("The swagger4jaxrs config is missing.")
         }
 
-        if (local.resourcePackage.isEmpty()) {
+        if (config.resourcePackage.isEmpty()) {
             throw new IllegalStateException("The swagger4jaxrs config requires a resourcePackage path.")
         }
+
+        return config
     }
 }
